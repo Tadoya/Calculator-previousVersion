@@ -1,6 +1,8 @@
 package com.example.choi.app5_calculator2;
 
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 
 public class MainActivity extends AppCompatActivity {
+
 
     private String cnt="0";
 
@@ -34,13 +37,28 @@ public class MainActivity extends AppCompatActivity {
     BigDecimal dcmalA,dcmalB, dcmalC; //소수의 곱하기 나누기
     char operator='0';
     boolean caled = false, errorFlag = false, tempFlag = false, secondFlag = false, radFlag = false,
-    prtFlag = false;
+            prtFlag = false, prtEndFlag = false;
 
     int prtFlagNum = 0;    //괄호 플레그
     char prtOperator = '0';
     String prtTemp = "";
 
     float textsize;
+
+    private SoundPool sound_pool;
+    private int sound_click;
+
+    private void initSound() {
+        //SoundPool(int maxStreams, int streamType, int srcQuality)
+        sound_pool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        //public int load (Context context, int resId, int priority)
+        sound_click = sound_pool.load(this, R.raw.click2, 1);
+    }
+
+    //public final int play (int soundID, float leftVolume, float rightVolume, int priority, int loop, float rate)
+    public void playSound(){
+        sound_pool.play( sound_click, 1f, 1f, 0, 0, 1f );
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +68,10 @@ public class MainActivity extends AppCompatActivity {
 
         if(savedInstanceState != null){
             cnt = savedInstanceState.getString("num");
+            number = cnt;
         }
+
+        initSound();
 
         textView = (TextView) findViewById(R.id.textView);
         radText = (TextView) findViewById(R.id.radText);
@@ -113,8 +134,12 @@ public class MainActivity extends AppCompatActivity {
         textsize = textView.getTextSize() / 2;
 
         textView.setText(cnt);
+        if(cnt.length()>=8 && textsize == 80){
+            textView.setTextSize(textsize-18);
+        }
 
     }
+
     /* 번호버튼 */
     public void onClick_Num(View v){
 
@@ -125,53 +150,58 @@ public class MainActivity extends AppCompatActivity {
             number = "";
             tempFlag= true; //계산 후(=) 연산자를 눌렀을 시에 대한 플레그
             prtFlag = false;
+            prtEndFlag = false;
             prtTemp = "";
             caled = false;
         }
-        switch (v.getId()) {
-            case R.id.button0:
-            case R.id.button10:
-                number += "0";
-                break;
-            case R.id.button1:
-                number += "1";
-                break;
-            case R.id.button2:
-                number += "2";
-                break;
-            case R.id.button3:
-                number += "3";
-                break;
-            case R.id.button4:
-                number += "4";
-                break;
-            case R.id.button5:
-                number += "5";
-                break;
-            case R.id.button6:
-                number += "6";
-                break;
-            case R.id.button7:
-                number += "7";
-                break;
-            case R.id.button8:
-                number += "8";
-                break;
-            case R.id.button9:
-                number += "9";
-                break;
-            case R.id.buttonDot:
-                if(number.isEmpty()) number = "0.";
-                else if(number.contains(".")) break;
-                else number += ".";
-                break;
+        if((textsize == 75 && textView.getText().length()<=16) || (textsize == 80)&& textView.getText().length()<=10) {
+            switch (v.getId()) {
+                case R.id.button0:
+                case R.id.button10:
+                    number += "0";
+                    break;
+                case R.id.button1:
+                    number += "1";
+                    break;
+                case R.id.button2:
+                    number += "2";
+                    break;
+                case R.id.button3:
+                    number += "3";
+                    break;
+                case R.id.button4:
+                    number += "4";
+                    break;
+                case R.id.button5:
+                    number += "5";
+                    break;
+                case R.id.button6:
+                    number += "6";
+                    break;
+                case R.id.button7:
+                    number += "7";
+                    break;
+                case R.id.button8:
+                    number += "8";
+                    break;
+                case R.id.button9:
+                    number += "9";
+                    break;
+                case R.id.buttonDot:
+                    if (number.isEmpty()) number = "0.";
+                    else if (number.contains(".")) break;
+                    else number += ".";
+                    break;
+            }
         }
-        textView.setText(number);   // 글자크기 조정
+        textView.setText(number);
+        // 글자크기 조정
         if(textView.getLineCount() > 1){
             textView.setTextSize(textsize-18);
         }
         buttonAC.setText("C");
         cnt = number;
+        playSound();
     }
     /* 옵션 */
     public void onClick_Option(View v){
@@ -186,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 caled = false;
                 errorFlag = false;
                 prtFlag = false;
+                prtEndFlag =false;
                 prtOperator = '0';
                 prtFlagNum = 0;
                 prtTemp = "";
@@ -212,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }textView.setText(answer);
         cnt = answer;
+        playSound();
     }
     /* 두번째 페이지 */
     public void onClick_Second(View v){
@@ -247,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
             buttonTanh.setText("tanh");
             secondFlag = false;
         }
+        playSound();
     }
     /* 라디안 */
     public void onClick_RAD(View v){
@@ -258,10 +291,11 @@ public class MainActivity extends AppCompatActivity {
             radText.setText("");
             radFlag = false;
         }
+        playSound();
     }
     /* 연산자에 따른 계산 부분 */
     public void onClick_Calc(View v){
-
+        playSound();
 
         if(tempFlag){   // 계산 후(=) 숫자버를을 눌렀을 시 temp값 초기화
             temp = "0";
@@ -273,21 +307,21 @@ public class MainActivity extends AppCompatActivity {
         if(operator != '0' && !caled) {     //연속된 연산자 버튼터치에 대한 수식(ex 1+1+ -> 2)
             switch (operator) {
                 case '+':
-                    if(prtFlag && !prtTemp.equals("")){
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                         temp = textView.getText().toString();
                         answer = String.valueOf(Double.parseDouble(temp)+Double.parseDouble(prtTemp));
                     }
                     else answer = String.valueOf(Double.parseDouble(temp) + Double.parseDouble(number));
                     break;
                 case '-':
-                    if(prtFlag && !prtTemp.equals("")){
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                         temp = textView.getText().toString();
                         answer = String.valueOf(Double.parseDouble(prtTemp)-Double.parseDouble(temp));
                     }
                     else answer = String.valueOf(Double.parseDouble(temp) - Double.parseDouble(number));
                     break;
                 case '*':
-                    if(prtFlag && !prtTemp.equals("")){
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                         temp = textView.getText().toString();
                         dcmalB = new BigDecimal(prtTemp);
                         dcmalA = new BigDecimal(temp);
@@ -296,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
                     else answer = String.valueOf(dcmalA.multiply(dcmalB));
                     break;
                 case '/':
-                    if(prtFlag && !prtTemp.equals("")) {
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag) {
                         temp = textView.getText().toString();
                         dcmalB = new BigDecimal(prtTemp);
                         dcmalA = new BigDecimal(temp);
@@ -327,14 +361,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case 'x':   // x^y
-                    if(prtFlag && !prtTemp.equals("")){
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                         temp = textView.getText().toString();
                         answer = String.valueOf(Math.pow(Double.parseDouble(prtTemp), Double.parseDouble(temp)));
                     }
                     else answer = String.valueOf(Math.pow(Double.parseDouble(temp), Double.parseDouble(number)));
                     break;
                 case 'r':
-                    if(prtFlag && !prtTemp.equals("")) {
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag) {
                         try {
                             answer = String.valueOf(Math.pow(Double.parseDouble(prtTemp), 1 / Double.parseDouble(temp)));
                         } catch (Exception e) {
@@ -362,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case 'e':
-                    if(prtFlag && !prtTemp.equals("")){
+                    if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                         temp = textView.getText().toString();
                         dcmalA = new BigDecimal(prtTemp);
                         if(Integer.parseInt(temp)<300) {
@@ -379,9 +413,12 @@ public class MainActivity extends AppCompatActivity {
                         else errorFlag = true;
                     }
                     break;
-
                 default:
                     break;
+            }
+            if(prtEndFlag){
+                prtFlag = false;
+                prtEndFlag = false;
             }
             if(errorFlag){
                 textView.setText("Error");
@@ -430,11 +467,12 @@ public class MainActivity extends AppCompatActivity {
     }
     /* 계산식에 따른 "="에 대한 출력 */
     public void onClick_Answer(View v){
+        playSound();
         dcmalA = new BigDecimal(temp);
         dcmalB = new BigDecimal(number);
         switch(operator){
             case '+':
-                if(prtFlag && !prtTemp.equals("")){
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                     temp = textView.getText().toString();
                     temp = String.valueOf(Double.parseDouble(temp)+Double.parseDouble(prtTemp));
                 }
@@ -443,7 +481,7 @@ public class MainActivity extends AppCompatActivity {
                 answerText();
                 break;
             case '-':
-                if(prtFlag && !prtTemp.equals("")){
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                     temp = textView.getText().toString();
                     temp = String.valueOf(Double.parseDouble(prtTemp)-Double.parseDouble(temp));
                 }
@@ -452,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 answerText();
                 break;
             case '*':
-                if(prtFlag && !prtTemp.equals("")){
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                     temp = textView.getText().toString();
                     dcmalB = new BigDecimal(prtTemp);
                     dcmalA = new BigDecimal(temp);
@@ -463,7 +501,7 @@ public class MainActivity extends AppCompatActivity {
                 answerText();
                 break;
             case '/':
-                if(prtFlag && !prtTemp.equals("")) {
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag) {
                     temp = textView.getText().toString();
                     dcmalB = new BigDecimal(prtTemp);
                     dcmalA = new BigDecimal(temp);
@@ -496,7 +534,7 @@ public class MainActivity extends AppCompatActivity {
                 answerText();
                 break;
             case 'x':
-                if(prtFlag && !prtTemp.equals("")){
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                     temp = textView.getText().toString();
                     temp = String.valueOf(Math.pow(Double.parseDouble(prtTemp), Double.parseDouble(temp)));
                 }
@@ -505,7 +543,7 @@ public class MainActivity extends AppCompatActivity {
                 answerText();
                 break;
             case 'r':
-                if(prtFlag && !prtTemp.equals("")) {
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag) {
                     try {
                         temp = String.valueOf(Math.pow(Double.parseDouble(prtTemp), 1 / Double.parseDouble(temp)));
                     } catch (Exception e) {
@@ -536,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 'e':
                 //temp = String.valueOf(Double.parseDouble(temp)* Math.pow(10,Double.parseDouble(number)));
-                if(prtFlag && !prtTemp.equals("")){
+                if(prtFlag && !prtTemp.equals("") && prtEndFlag){
                     temp = textView.getText().toString();
                     if(Integer.parseInt(temp)<300) {
                         dcmalA = new BigDecimal(prtTemp);
@@ -562,6 +600,7 @@ public class MainActivity extends AppCompatActivity {
     }
     /*한 번의 터치로만 계산되는 함수 */
     public void onClick_Calc2(View v){
+        playSound();
         switch (v.getId()){
             case R.id.buttonTenX:
                 answer = textView.getText().toString();
@@ -613,15 +652,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.buttonFactorial:
                 answer = textView.getText().toString();
-                try {
-                    answer = String.valueOf(factorial(Double.parseDouble(answer)));
-                }catch (Exception e){
-                    number = "";
-                    operator = '0';
-                    answer = "0";
-                    temp = "0";
-                    errorFlag = true;
-                }
+                if(Double.parseDouble(answer) % 1 == 0)
+                    answer = String.valueOf(factorial((int)Double.parseDouble(answer)));
+                else errorFlag = true;
                 break;
             case R.id.buttonSin:
                 answer = textView.getText().toString();
@@ -681,16 +714,16 @@ public class MainActivity extends AppCompatActivity {
                 if(!secondFlag)
                     answer = String.valueOf(Math.sinh(Double.parseDouble(answer)));
                 else
-                answer = String.valueOf(Math.log(Double.parseDouble(answer) +
-                        Math.sqrt(Double.parseDouble(answer) * Double.parseDouble(answer) - 1.0)));
+                    answer = String.valueOf(Math.log(Double.parseDouble(answer) +
+                            Math.sqrt(Double.parseDouble(answer) * Double.parseDouble(answer) - 1.0)));
                 break;
             case R.id.buttonTanh:
                 answer = textView.getText().toString();
                 if(!secondFlag)
                     answer = String.valueOf(Math.tanh(Double.parseDouble(answer)));
                 else
-                answer = String.valueOf(0.5 *
-                        Math.log((Double.parseDouble(answer) + 1.0) / ((Double.parseDouble(answer)) - 1.0)));
+                    answer = String.valueOf(0.5 *
+                            Math.log((Double.parseDouble(answer) + 1.0) / ((Double.parseDouble(answer)) - 1.0)));
                 break;
             case R.id.buttonE:
                 answer = String.valueOf(Math.exp(1));
@@ -710,6 +743,7 @@ public class MainActivity extends AppCompatActivity {
     }
     /* 메모리 부분 */
     public void onClick_Memory(View v){
+        playSound();
         switch(v.getId()){
             case R.id.buttonMemoryClear:
                 memory = 0;
@@ -742,6 +776,7 @@ public class MainActivity extends AppCompatActivity {
     }
     /* 괄호 처리 */
     public void onClick_Parenthses(View v) {
+        playSound();
         switch (v.getId()) {
             case R.id.buttonParenthesesStart:
                 if (prtFlagNum == 0) prtOperator = operator;
@@ -758,7 +793,7 @@ public class MainActivity extends AppCompatActivity {
                 ;
                 break;
             case R.id.buttonParenthesesEnd:
-                if (prtFlagNum > 0 && prtFlag) {
+                if (prtFlagNum > 0) {
                     dcmalA = new BigDecimal(temp);
                     dcmalB = new BigDecimal(number);
                     dcmalC = new BigDecimal(Math.pow(10, Double.parseDouble(number)));
@@ -807,15 +842,14 @@ public class MainActivity extends AppCompatActivity {
                     //prtmemory[prtFlagNum-1] = Double.parseDouble(textView.getText().toString());
                     prtFlagNum--;
                 }
-                if (prtFlagNum == 0 && prtFlag && prtOperator != '0') {
+                if (prtFlagNum == 0 && prtOperator != '0') {
                     operator = prtOperator;
                     prtOperator = '0';
+                    prtEndFlag = true;
                 }
                 if (prtFlagNum == 0) {
                     buttonPrtStart.setTextColor(Color.BLACK);
-                    ;
                     buttonPrtEnd.setTextColor(Color.BLACK);
-                    ;
                 }
                 break;
             default:
@@ -823,10 +857,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public int factorial(double i){
+    public int factorial(int i){
         if(i==0 || i==1) return 1;
         else{
-            return (int) (i*factorial(i-1));
+            return (i*factorial(i-1));
         }
     }
     // 에러 유무 및 정수 소수 판별 최종 출력 값
@@ -837,20 +871,40 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             if(Double.parseDouble(answer) % 1 == 0){
-                textView.setText(""+(long)Double.parseDouble(answer));//String.format("%.0f",Double.parseDouble(answer)));
-                cnt=""+(long)Double.parseDouble(answer);
+                if((answer.length() <=17 && textsize == 75)|| (answer.length()<= 10 && textsize == 80)) {
+                    textView.setText("" + (long) Double.parseDouble(answer));//String.format("%.0f",Double.parseDouble(answer)));
+                    cnt = "" + (long) Double.parseDouble(answer);
+                }
+                else{
+                    answer = String.format("%.2e",Double.parseDouble(answer));
+                    textView.setText(answer);
+                    cnt = answer;
+                }
             }
             else {
-                textView.setText(""+Double.parseDouble(answer));
-                cnt = answer;
+                if((answer.length() <=17 && textsize == 75)|| (answer.length()<= 10 && textsize == 80)) {
+                    textView.setText(answer);
+                    cnt = answer;
+                }
+                else{
+                    answer = String.format("%.2e",Double.parseDouble(answer));
+                    textView.setText(answer);
+                    cnt = answer;
+                }
             }
+        }
+        // 글자크기 조정
+        if(textView.getLineCount() > 1){
+            textView.setTextSize(textsize-18);
         }
     }
     @Override
     protected void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
+        if(cnt.length()>10){
+            cnt = cnt.substring(0,cnt.length()-(cnt.length()-10));
+        }
         outState.putString("num",cnt);
     }
-
 }
 

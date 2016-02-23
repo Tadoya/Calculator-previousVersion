@@ -12,17 +12,18 @@
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="60dp"
+        android:layout_height="100dp"
         android:text="0"
         android:id="@+id/textView"
         android:textAlignment="textEnd"
         android:textColor="#ffffff"
-        android:textSize="50sp"
+        android:textSize="75sp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false"
         android:maxLines="1"
         android:phoneNumber="false"
-        android:maxLength="16" />
+        android:maxLength="16"
+        android:gravity="bottom" />
 
     <TableLayout
         android:layout_width="match_parent"
