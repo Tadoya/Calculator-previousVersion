@@ -23,7 +23,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:singleLine="false"
-        android:maxLength="10"
+        android:maxLength="11"
         android:cursorVisible="false"
         android:maxLines="1"
         android:gravity="bottom" />

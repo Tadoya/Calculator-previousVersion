@@ -17,12 +17,12 @@
         android:id="@+id/textView"
         android:textAlignment="textEnd"
         android:textColor="#ffffff"
-        android:textSize="75sp"
+        android:textSize="78sp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false"
         android:maxLines="1"
         android:phoneNumber="false"
-        android:maxLength="16"
+        android:maxLength="17"
         android:gravity="bottom" />
 
     <TableLayout
@@ -669,7 +669,7 @@
                 android:singleLine="false"
                 android:textAllCaps="false"
                 android:layout_weight="1"
-                android:onClick="onClick_Calc2" />
+                android:onClick="onClick_Option" />
 
             <Button
                 android:layout_width="fill_parent"
@@ -851,7 +851,7 @@
                 android:singleLine="false"
                 android:textAllCaps="false"
                 android:layout_weight="1"
-                android:onClick="onClick_Calc2" />
+                android:onClick="onClick_Option" />
 
             <Button
                 android:layout_width="fill_parent"
@@ -868,7 +868,7 @@
                 android:singleLine="false"
                 android:textAllCaps="false"
                 android:layout_weight="1"
-                android:onClick="onClick_Calc2" />
+                android:onClick="onClick_Option" />
 
             <Button
                 android:text="0"
