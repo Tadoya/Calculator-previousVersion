@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private String cnt="0", ac="AC";
+    String cntTemp="0";
 
     Button  buttonAC, buttonEqual, buttonPlusMinus, buttonPlus, buttonMinus, buttonDivision,
             buttonMultiply, buttonPercent, buttonDot;
@@ -114,12 +115,12 @@ public class MainActivity extends AppCompatActivity {
         buttonPercent = (Button) findViewById(R.id.buttonPercent);
         buttonDot = (Button) findViewById(R.id.buttonDot);
 
-        buttonTenX = (Button) findViewById(R.id.buttonTenX);
-        buttonEx = (Button) findViewById(R.id.buttonEx);
-        buttonXy = (Button) findViewById(R.id.buttonXy);
-        buttonX2 = (Button) findViewById(R.id.buttonX2);
-        buttonX3 = (Button) findViewById(R.id.buttonX3);
-        buttonFraction = (Button) findViewById(R.id.buttonFraction);
+        buttonTenX = (Button) findViewById(R.id.buttonTenX);    //10^x
+        buttonEx = (Button) findViewById(R.id.buttonEx);        //e^x
+        buttonXy = (Button) findViewById(R.id.buttonXy);        //x^y
+        buttonX2 = (Button) findViewById(R.id.buttonX2);        //x^2
+        buttonX3 = (Button) findViewById(R.id.buttonX3);        //x^3
+        buttonFraction = (Button) findViewById(R.id.buttonFraction);    // 1/x
         buttonRoot = (Button) findViewById(R.id.buttonRoot);
         buttonRoot3 = (Button) findViewById(R.id.buttonRoot3);
         buttonRooty = (Button) findViewById(R.id.buttonRooty);
@@ -143,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
         buttonMM = (Button) findViewById(R.id.buttonMemoryMinus);
         buttonMR = (Button) findViewById(R.id.buttonMemoryRead);
 
-        buttonPrtStart = (Button) findViewById(R.id.buttonParenthesesStart);
-        buttonPrtEnd = (Button) findViewById(R.id.buttonParenthesesEnd);
+        buttonPrtStart = (Button) findViewById(R.id.buttonParenthesesStart);    // (
+        buttonPrtEnd = (Button) findViewById(R.id.buttonParenthesesEnd);        // )
 
         // 이유는 모르겠지만 텍스트크기를 두배로 받아와서 나누기 2를 해줌
         textsize = textView.getTextSize() / 2;
@@ -153,21 +154,35 @@ public class MainActivity extends AppCompatActivity {
         if(cnt.length()>=8 && textsize == 80){
             textView.setTextSize(textsize-18);
         }
-
+        //cntTemp = cnt;
         // 세로 가로모드를 전활할 때 허용 글자수를 초과하면 지수표기법으로 표시
         if((((textsize == 80) && (cnt.length() > 10))) || ((textsize == 78) && (cnt.length() > 16))){
             if((Double.parseDouble(cnt) < 0) && (cnt.length() == 11)) {   // 세로모드에서 11글자에 음수이면 사이즈만 줄이기
                 textView.setTextSize(textsize - 24);
-                textView.setText(cnt);
+                cntTemp = cnt;
             }
             else if((textsize ==80) && (Double.parseDouble(cnt) < 0)) {  // 세로모드에서 12글자 이상에 음수면 텍스트 사이즈 줄이고 지수표기
                 textView.setTextSize(textsize - 22);
-                textView.setText(String.format("%.4E",Double.parseDouble(cnt)));
+                cntTemp = String.format("%.4E",Double.parseDouble(cnt));
             }
-            else
-                textView.setText(String.format("%.4E",Double.parseDouble(cnt)));
+            else {
+                cntTemp = String.format("%.4E", Double.parseDouble(cnt));
+                // 지수표기 법에서 E-4미만일 경우 지수표기법이 아닌 일반표기로 출력
+                if((Integer.parseInt(cntTemp.substring(cntTemp.length()-2, cntTemp.length())))<4){
+                    if(textsize==80) {
+                        cntTemp = cnt.substring(0, 10);
+                    }
+                    else {
+                        cntTemp = cnt.substring(0, 16);
+                        textView.setTextSize(textsize-18);
+                    }
+                }
+            }
+            textView.setText(cntTemp);
         }
-        else textView.setText(cnt);
+        else{
+            textView.setText(cnt);
+        }
 
         buttonAC.setText(ac);
 
@@ -919,26 +934,29 @@ public class MainActivity extends AppCompatActivity {
             if(Double.parseDouble(answer) % 1 == 0 && (Double.parseDouble(answer)<=Long.MAX_VALUE) && (Double.parseDouble(answer)>=Long.MIN_VALUE)){    // 출력 값이 정수 일 때(long의 최대최소값범위내)
                 cnt = "" + (long) Double.parseDouble(answer);
                 answer = cnt;
-                // 출력 값이 지수표기법이고, 가로모드(16자 초과)이거나 세로모드(10자 초과)일 때 지수표기 법으로 표시
+                // 가로모드(16자 초과)이거나 세로모드(10자 초과)일 때 지수 표기법으로 출력(음수일땐 11자)
                 if((((answer).length() > 16) && (textsize == 78)) || ((((answer.length() > 10) && (answer.charAt(0) != '-')) || ((answer.length() > 11) && (answer.charAt(0) == '-'))) && (textsize == 80))) {
                     answer = String.format("%.4E",Double.parseDouble(answer));
                 }
                 textView.setText(answer);
             }
-            else {
-                if((answer.length() <=16 && textsize == 78)|| (answer.length()<= 10 && textsize == 80)) {
-                    textView.setText(""+Double.parseDouble(answer));
-                    cnt = answer;
-                }
-
-                else{
-                    cnt = answer;
+            else{
+                cnt = answer;
+                // 가로모드(16자 초과)이거나 세로모드(10자 초과)일 때 지수 표기법으로 츨력
+                if((((answer).length() > 16) && (textsize == 78)) || ((((answer.length() > 10) && (answer.charAt(0) != '-')) || ((answer.length() > 11) && (answer.charAt(0) == '-'))) && (textsize == 80))) {
                     answer = String.format("%.4E",Double.parseDouble(answer));
-                    textView.setText(answer);
+                    // 지수표기법이 E-4까지는 그냥 지수 표기법이 아닌 일반 표기법으로 출력
+                    if(Integer.parseInt(answer.substring(answer.length()-2,answer.length())) < 4){
+                        if(textsize==80)
+                            answer = cnt.substring(0, 10);
+                        else
+                            answer = cnt.substring(0, 16);
+                    }
                 }
+                textView.setText(answer);
             }
         }
-        // 글자크기 조정
+        // 글자크기 조정(출력결과가 2줄을 넘어가면 글자크기 줄이기)
         if(textView.getLineCount() > 1){
             textView.setTextSize(textsize-18);
         }
