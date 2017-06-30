@@ -1,4 +1,4 @@
-package com.example.choi.app5_calculator2;
+package com.github.tadoya.calculator;
 
 import org.junit.Test;
 

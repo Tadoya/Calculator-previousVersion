@@ -1,4 +1,4 @@
-package com.example.choi.app5_calculator2;
+package com.github.tadoya.calculator;
 
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -288,12 +288,18 @@ public class MainActivity extends AppCompatActivity {
                     if((answer.contains("E") && textsize == 80) || ((textsize==80) && (answer.length() >= 8))){
                         textView.setTextSize(textsize-18);
                     }
+                    else if(textsize == 80 && answer.length() <= 7){
+                        textView.setTextSize(textsize);
+                    }
                 } else {
                     if(answer.contains("E")  && textsize == 80){
                         textView.setTextSize(textsize-22);
                     }
                     else if(textsize==80 && answer.length()>9){
                         textView.setTextSize(textsize-24);
+                    }
+                    else if(textsize==80 && answer.length() >= 7){
+                        textView.setTextSize(textsize-18);
                     }
                     answer = "-" + answer;
                     number = "-" + number;
